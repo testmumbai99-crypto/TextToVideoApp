@@ -20,6 +20,7 @@ import java.io.File
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var editTextLines: EditText
     private lateinit var btnGenerate: Button
     private lateinit var progressBar: ProgressBar
@@ -56,7 +57,9 @@ class MainActivity : AppCompatActivity() {
             try {
                 val outputFile = File(cacheDir, "text_video.mp4")
                 if (outputFile.exists()) outputFile.delete()
+
                 renderTextToVideo(lines, outputFile)
+
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     btnGenerate.isEnabled = true
@@ -70,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     btnGenerate.isEnabled = true
-                    tvStatus.text = "Error: ${e.localizedMessage}"
+                    tvStatus.text = "Error: " + e.localizedMessage
                 }
             }
         }
@@ -82,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         val fps = 30
         val durationPerSlideSeconds = 2
         val framesPerSlide = fps * durationPerSlideSeconds
-        val bitRate = 2_000_000
+        val bitRate = 2000000
         val mimeType = "video/avc"
 
         val format = MediaFormat.createVideoFormat(mimeType, width, height).apply {
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         var presentationTimeUs = 0L
-        val frameDurationUs = 1_000_000L / fps
+        val frameDurationUs = 1000000L / fps
         var muxerStarted = false
 
         for (line in lines) {
@@ -141,7 +144,7 @@ class MainActivity : AppCompatActivity() {
         endOfStream: Boolean,
         onMuxerStart: (Int) -> Unit
     ) {
-        val timeoutUs = 10_000L
+        val timeoutUs = 10000L
         while (true) {
             val status = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
             if (status == MediaCodec.INFO_TRY_AGAIN_LATER) {
