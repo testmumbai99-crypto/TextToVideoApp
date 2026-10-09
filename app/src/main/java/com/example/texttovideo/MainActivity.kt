@@ -20,7 +20,6 @@ import java.io.File
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var editTextLines: EditText
     private lateinit var btnGenerate: Button
     private lateinit var progressBar: ProgressBar
@@ -57,9 +56,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val outputFile = File(cacheDir, "text_video.mp4")
                 if (outputFile.exists()) outputFile.delete()
-
                 renderTextToVideo(lines, outputFile)
-
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     btnGenerate.isEnabled = true
@@ -73,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     progressBar.visibility = View.GONE
                     btnGenerate.isEnabled = true
-                    tvStatus.text = "Error: \${e.localizedMessage}"
+                    tvStatus.text = "Error: ${e.localizedMessage}"
                 }
             }
         }
@@ -101,9 +98,6 @@ class MainActivity : AppCompatActivity() {
         encoder.start()
 
         val muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        var trackIndex = -1
-        var muxerStarted = false
-
         val bufferInfo = MediaCodec.BufferInfo()
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE
@@ -113,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         var presentationTimeUs = 0L
         val frameDurationUs = 1_000_000L / fps
+        var muxerStarted = false
 
         for (line in lines) {
             for (i in 0 until framesPerSlide) {
@@ -123,23 +118,16 @@ class MainActivity : AppCompatActivity() {
                 surface.unlockCanvasAndPost(canvas)
 
                 presentationTimeUs += frameDurationUs
-                drainEncoder(encoder, muxer, bufferInfo, false) { newTrack ->
-                    trackIndex = newTrack
-                    muxerStarted = true
-                }
+                drainEncoder(encoder, muxer, bufferInfo, false) { muxerStarted = true }
             }
         }
 
         encoder.signalEndOfInputStream()
-        drainEncoder(encoder, muxer, bufferInfo, true) { newTrack ->
-            trackIndex = newTrack
-            muxerStarted = true
-        }
+        drainEncoder(encoder, muxer, bufferInfo, true) { muxerStarted = true }
 
         encoder.stop()
         encoder.release()
         surface.release()
-
         if (muxerStarted) {
             muxer.stop()
             muxer.release()
@@ -154,7 +142,6 @@ class MainActivity : AppCompatActivity() {
         onMuxerStart: (Int) -> Unit
     ) {
         val timeoutUs = 10_000L
-
         while (true) {
             val status = encoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
             if (status == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -166,22 +153,16 @@ class MainActivity : AppCompatActivity() {
                 onMuxerStart(track)
             } else if (status >= 0) {
                 val encodedData = encoder.getOutputBuffer(status) ?: continue
-
                 if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     bufferInfo.size = 0
                 }
-
                 if (bufferInfo.size != 0) {
                     encodedData.position(bufferInfo.offset)
                     encodedData.limit(bufferInfo.offset + bufferInfo.size)
                     muxer.writeSampleData(0, encodedData, bufferInfo)
                 }
-
                 encoder.releaseOutputBuffer(status, false)
-
-                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                    break
-                }
+                if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) break
             }
         }
     }
