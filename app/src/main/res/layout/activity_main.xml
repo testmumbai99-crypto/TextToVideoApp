@@ -13,25 +13,26 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paste Advertisement Text / Poster Copy:"
+            android:text="Video Script / Prompt:"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etScript"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="140dp"
             android:gravity="top|start"
-            android:hint="महा बचत ऑफर – खटखरी हीरो एजेंसी 🎉\nनवरात्रि, धनतेरस एवं दीपावली के खास मौके पर शानदार ऑफर!\n..."
+            android:hint="Type or paste your story here...\n\nEach line becomes a scene. Add multiple paragraphs for a 2+ minute full video!"
             android:background="@android:drawable/editbox_background_normal"
             android:padding="8dp"
             android:inputType="textMultiLine"
             android:layout_marginTop="6dp" />
 
+        <!-- Voice Selection -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Voiceover Language & Gender:"
+            android:text="Voiceover Gender:"
             android:textStyle="bold"
             android:layout_marginTop="12dp" />
 
@@ -40,29 +41,53 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:checkedButton="@+id/rbHindiFemale">
+            android:checkedButton="@+id/rbFemale">
 
             <RadioButton
-                android:id="@+id/rbHindiFemale"
+                android:id="@+id/rbFemale"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Hindi Female 🎙️" />
+                android:text="Female Voice 🎙️" />
 
             <RadioButton
-                android:id="@+id/rbHindiMale"
+                android:id="@+id/rbMale"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Hindi Male 🎙️" />
+                android:text="Male Voice 🎙️" />
         </RadioGroup>
+
+        <!-- Scene Duration Control -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Seconds per Scene:"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etSceneDuration"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="10"
+                android:textAlignment="center" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnGenerate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Generate Realistic HD Ad Video 🎬" />
+            android:text="Generate 2+ Min Video with Voice" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -83,7 +108,7 @@
         <VideoView
             android:id="@+id/videoPreview"
             android:layout_width="match_parent"
-            android:layout_height="340dp"
+            android:layout_height="320dp"
             android:layout_marginTop="16dp" />
 
     </LinearLayout>
